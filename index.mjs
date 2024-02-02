@@ -17,7 +17,7 @@ export const handler = async (event) => {
         const catalog = await getS3Object(bucketName, filename);
         const catalogData = JSON.parse(catalog)
       
-        if(body.type == "product") {
+        if(body.type == "produto") {
           updateOrAddItem(catalogData.products, body)
         } else {
           updateOrAddItem(catalogData.categories, body)
@@ -28,7 +28,7 @@ export const handler = async (event) => {
       } catch (error) {
         if(error.message == "Error getting object from bucket") {
           const newCatalog = { products: [], categories: [] }
-          if(body.type == "product") {
+          if(body.type == "produto") {
             newCatalog.products.push(body);
           } else {
             newCatalog.categories.push(body);
