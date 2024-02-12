@@ -17,11 +17,10 @@ export const handler = async (event) => {
         const catalog = await getS3Object(bucketName, filename);
         const catalogData = JSON.parse(catalog)
       
-        if(body.type == "produto") {
-          updateOrAddItem(catalogData.products, body)
-        } else {
-          updateOrAddItem(catalogData.categories, body)
-        }
+        if(body.type == 'produto'){updateOrAddItem(catalogData.products, body)}
+        if(body.type == 'categoria'){updateOrAddItem(catalogData.categories, body)}
+        if(body.type == 'delete-produto'){deleteS3Item(catalogData.products, body)}
+        if(body.type == 'delete-categoria'){deleteS3Item(catalogData.categories, body)}
         
         await putS3Object(bucketName, filename, JSON.stringify(catalogData));
       
@@ -103,4 +102,16 @@ function streamToString(stream) {
         stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
         stream.on('error', reject);
     });
+}
+
+// função para deletar uma categoria ou um produto
+function deleteS3Item(catalog, newItem) {
+  const index = catalog.findIndex(item => item.id === newItem.id);
+  try {
+    if (index !== -1) {
+      catalog.splice(index, 1);
+    }
+  } catch (error) {
+    throw new Error("Erro ao deletar um item!");
+  }
 }
